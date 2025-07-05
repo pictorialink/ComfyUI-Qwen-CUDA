@@ -1,0 +1,4 @@
+huggingface_hub
+torch
+transformers
+llama-cpp-python

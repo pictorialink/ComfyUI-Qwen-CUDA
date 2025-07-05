@@ -1,0 +1,16 @@
+# ComfyUI 自定义节点 .gitignore
+
+# Python 虚拟环境
+venv/
+env/
+.venv/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# ComfyUI 生成的文件和缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

@@ -1,0 +1,103 @@
+{
+  "id": "4035858e-8e6f-4056-9442-1c3300bb9236",
+  "revision": 0,
+  "last_node_id": 2,
+  "last_link_id": 1,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "ShowText|pysssss",
+      "pos": [
+        961.3607177734375,
+        116.23762512207031
+      ],
+      "size": [
+        140,
+        76
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "你好！有什么我可以帮助你的吗？😊"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "Qwen3_GGUF",
+      "pos": [
+        358.76812744140625,
+        153.03355407714844
+      ],
+      "size": [
+        400,
+        238
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Qwen3_GGUF"
+      },
+      "widgets_values": [
+        "你是一个智能助理",
+        "你好",
+        false,
+        false,
+        0.7,
+        512
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        0,
+        0.2350921630859375
+      ]
+    },
+    "frontendVersion": "1.23.4"
+  },
+  "version": 0.4
+}
