@@ -36,4 +36,4 @@ pip install -r requirements.txt
 }
 ```
 
-Among them, cuda[0] represents the Qwen3 model. If you want to use models with other parameters or quantization levels, you can modify this part, but note that only Qwen3 can be used. The part of cuda[1] contains the tokenizer configuration information for Qwen3 and does not need to be modified.
+Among them, cuda[0] represents the Qwen3 model. If you want to use models with other parameters or quantization levels, you can modify this part, but note that only Qwen3 can be used. Taking Qwen3 - 8B - Q5_K_M.gguf as an example, this file will be downloaded to ComfyUI/models/LLM/Qwen3-8B-GGUF/Qwen3-8B-Q5_K_M.gguf. The part of cuda[1] contains the tokenizer configuration information for Qwen3 and does not need to be modified.
