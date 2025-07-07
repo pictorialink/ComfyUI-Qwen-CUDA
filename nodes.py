@@ -17,7 +17,9 @@ class Qwen3_GGUF:
         with open(models_info_file, "r", encoding="utf-8") as f:
             self.models_info = json.load(f)
         gguf_info = self.models_info['cuda'][0]
+        tokenizer_info = self.models_info['cuda'][1]
         self.gguf_file = os.path.join(folder_paths.base_path, gguf_info['local_path'], gguf_info['repo_id'].split("/")[-1], gguf_info['files'][0])
+        self.tokenizer_dir = os.path.join(folder_paths.base_path, tokenizer_info['local_path'], tokenizer_info['repo_id'].split("/")[-1])
         self.bf16_support = (
             torch.cuda.is_available()
             and torch.cuda.get_device_capability("cuda")[0] >= 8
@@ -77,7 +79,7 @@ class Qwen3_GGUF:
                     )
                     print(f"Model downloaded to: {os.path.join(file_dir, file_name)}")
         if self.tokenizer is None:
-            self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-8B")
+            self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_dir)
         # 3. 格式化提示（Qwen3 使用特定的聊天模板）
         def format_prompt(system_prompt,user_prompt):
             # 禁用 think 模式
