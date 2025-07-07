@@ -26,7 +26,7 @@ class Qwen3_GGUF:
                 "system_prompt": ("STRING", {"default": "你是一个智能助理","multiline": True}),
                 "user_prompt": ("STRING", {"multiline": True}),
                 "direct": ("BOOLEAN", {"default": False}),
-                "keep_model_loaded": ("BOOLEAN", {"default": False}),
+                # "keep_model_loaded": ("BOOLEAN", {"default": False}),
                 "temperature": (
                     "FLOAT",
                     {"default": 0.7, "min": 0, "max": 1, "step": 0.1},
@@ -35,6 +35,12 @@ class Qwen3_GGUF:
                     "INT",
                     {"default": 512, "min": 128, "max": 2048, "step": 1},
                 ),
+                "seed": ("INT", {
+                    "default": 0,  # 默认值
+                    "min": 0,      # 最小值
+                    "max": 0xffffffffffffffff,  # 最大值（64位整数）
+                    "step": 1      # 步长
+                }),
             }
         }
     
@@ -47,9 +53,10 @@ class Qwen3_GGUF:
         system_prompt,
         user_prompt,
         direct,
-        keep_model_loaded,
+        # keep_model_loaded,
         temperature,
         max_new_tokens,
+        seed=-1
     ):
         if direct:
             return (user_prompt,)
@@ -110,15 +117,22 @@ class Qwen3_GGUF:
             prompt,
             max_tokens=2048,
             stop=["</s>"],
-            echo=False
+            echo=False,
+            seed=seed
         )
         response = remove_think_tags(output["choices"][0]["text"])
-        if not keep_model_loaded:
-            del self.tokenizer
-            del self.model
-            self.tokenizer = None
-            self.model = None
-            torch.cuda.empty_cache()
-            torch.cuda.ipc_collect()
+        # if not keep_model_loaded:
+        #     del self.tokenizer
+        #     del self.model
+        #     self.tokenizer = None
+        #     self.model = None
+        #     torch.cuda.empty_cache()
+        #     torch.cuda.ipc_collect()
+        del self.tokenizer
+        del self.model
+        self.tokenizer = None
+        self.model = None
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
         return (response,)
                 
