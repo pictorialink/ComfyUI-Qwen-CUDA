@@ -5,16 +5,19 @@ from huggingface_hub import hf_hub_download
 from transformers import AutoTokenizer
 from llama_cpp import Llama
 import re
+import json
+from pathlib import Path
 
 class Qwen3_GGUF:
     def __init__(self):
         self.tokenizer = None
         self.model = None
-        self.model_repo_id = "Qwen/Qwen3-8B-GGUF"
-        self.gguf_file = "Qwen3-8B-Q5_K_M.gguf"
-        self.model_checkpoint = os.path.join(
-            folder_paths.models_dir, "LLM", self.gguf_file
-        )
+        current_dir = Path(__file__).parent.resolve()
+        models_info_file = os.path.join(current_dir, "models.json")
+        with open(models_info_file, "r", encoding="utf-8") as f:
+            self.models_info = json.load(f)
+        gguf_info = self.models_info['cuda'][0]
+        self.gguf_file = os.path.join(folder_paths.base_path, gguf_info['local_path'], gguf_info['repo_id'].split("/")[-1], gguf_info['files'][0])
         self.bf16_support = (
             torch.cuda.is_available()
             and torch.cuda.get_device_capability("cuda")[0] >= 8
@@ -60,15 +63,19 @@ class Qwen3_GGUF:
     ):
         if direct:
             return (user_prompt,)
-        if not os.path.exists(self.model_checkpoint):
-            # 使用 huggingface 下载
-            file_path = hf_hub_download(
-                repo_id=self.model_repo_id,
-                filename=self.gguf_file,
-                local_dir=os.path.join(
-            folder_paths.models_dir, "LLM")
-            )
-            print(f"Model downloaded to: {file_path}")
+        # 模型是否存在
+        models = self.models_info['cuda']
+        for model in models:
+            file_dir = os.path.join(folder_paths.base_path, model['local_path'], model['repo_id'].split("/")[-1])
+            for file_name in model['files']:
+                if not os.path.exists(os.path.join(file_dir, file_name)):
+                    # 使用 huggingface 下载
+                    file_path = hf_hub_download(
+                        repo_id=model['repo_id'],
+                        filename=file_name,
+                        local_dir=file_dir
+                    )
+                    print(f"Model downloaded to: {os.path.join(file_dir, file_name)}")
         if self.tokenizer is None:
             self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3-8B")
         # 3. 格式化提示（Qwen3 使用特定的聊天模板）
@@ -87,7 +94,7 @@ class Qwen3_GGUF:
             return prompt
         if self.model is None:
             self.model = Llama(
-                model_path=self.model_checkpoint,
+                model_path=self.gguf_file,
                 n_ctx=4096,  # 上下文长度
                 n_gpu_layers=-1,  # -1 表示将所有层卸载到 GPU（如果支持）
                 temperature=temperature,  # 控制生成文本的随机性

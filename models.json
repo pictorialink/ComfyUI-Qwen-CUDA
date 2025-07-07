@@ -6,6 +6,18 @@
             "files": [
                 "Qwen3-8B-Q5_K_M.gguf"
             ]
+        },
+        {
+            "repo_id": "Qwen/Qwen3-8B",
+            "local_path": "models/LLM",
+            "files": [
+                "tokenizer_config.json",
+                "vocab.json",
+                "merges.txt",
+                "tokenizer.json",
+                "config.json",
+                "generation_config.json"
+            ]
         }
     ]
 }
