@@ -1,0 +1,11 @@
+{
+    "cuda": [
+        {
+            "repo_id": "Qwen/Qwen3-8B-GGUF",
+            "local_path": "models/LLM",
+            "files": [
+                "Qwen3-8B-Q5_K_M.gguf"
+            ]
+        }
+    ]
+}
