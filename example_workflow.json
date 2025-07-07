@@ -1,19 +1,57 @@
 {
-  "id": "4035858e-8e6f-4056-9442-1c3300bb9236",
+  "id": "76972690-5f37-4c3d-86aa-171bca15d47b",
   "revision": 0,
-  "last_node_id": 2,
-  "last_link_id": 1,
+  "last_node_id": 8,
+  "last_link_id": 7,
   "nodes": [
+    {
+      "id": 1,
+      "type": "Qwen3_GGUF",
+      "pos": [
+        342.56640625,
+        357.671875
+      ],
+      "size": [
+        560.05078125,
+        401.828125
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Qwen3_GGUF"
+      },
+      "widgets_values": [
+        "你是一个擅长英文的翻译专家，将用户输入的内容翻译成英语",
+        "前方遇到一团黑色的烟雾，看不清楚里面有什么",
+        false,
+        false,
+        0,
+        512,
+        280484553870163,
+        "randomize"
+      ]
+    },
     {
       "id": 2,
       "type": "ShowText|pysssss",
       "pos": [
-        961.3607177734375,
-        116.23762512207031
+        1087.9453125,
+        428.29296875
       ],
       "size": [
-        140,
-        76
+        612.66796875,
+        209.2265625
       ],
       "flags": {},
       "order": 1,
@@ -37,43 +75,7 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "你好！有什么我可以帮助你的吗？😊"
-      ]
-    },
-    {
-      "id": 1,
-      "type": "Qwen3_GGUF",
-      "pos": [
-        358.76812744140625,
-        153.03355407714844
-      ],
-      "size": [
-        400,
-        238
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            1
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Qwen3_GGUF"
-      },
-      "widgets_values": [
-        "你是一个智能助理",
-        "你好",
-        false,
-        false,
-        0.7,
-        512
+        "There's a cloud of black smoke ahead, and it's too thick to see what's inside."
       ]
     }
   ],
@@ -91,10 +93,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1,
+      "scale": 1.1,
       "offset": [
-        0,
-        0.2350921630859375
+        389.22669601965345,
+        -79.29340818956808
       ]
     },
     "frontendVersion": "1.23.4"
