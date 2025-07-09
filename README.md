@@ -1,4 +1,4 @@
-# ComfyUI-Qwen-llama.cpp
+# ComfyUI-Qwen-CUDA
 
 基于 llama-cpp-python 的 Qwen3 + Qwen2.5VL 的推理。
 
