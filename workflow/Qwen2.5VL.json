@@ -1,0 +1,156 @@
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "revision": 0,
+    "last_node_id": 6,
+    "last_link_id": 4,
+    "nodes": [
+        {
+            "id": 3,
+            "type": "Qwen25_VL",
+            "pos": [
+                832.1690063476562,
+                254.3999481201172
+            ],
+            "size": [
+                400,
+                232
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+                {
+                    "name": "image",
+                    "shape": 7,
+                    "type": "IMAGE",
+                    "link": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "STRING",
+                    "type": "STRING",
+                    "links": [
+                        3
+                    ]
+                }
+            ],
+            "properties": {
+                "Node name for S&R": "Qwen25_VL"
+            },
+            "widgets_values": [
+                "描述一下这个图片",
+                "none",
+                0.7,
+                512,
+                1081,
+                "randomize",
+                ""
+            ]
+        },
+        {
+            "id": 2,
+            "type": "ShowText|pysssss",
+            "pos": [
+                1307.7333984375,
+                334.6875915527344
+            ],
+            "size": [
+                522.883544921875,
+                306.7386474609375
+            ],
+            "flags": {},
+            "order": 2,
+            "mode": 0,
+            "inputs": [
+                {
+                    "name": "text",
+                    "type": "STRING",
+                    "link": 3
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "STRING",
+                    "shape": 6,
+                    "type": "STRING",
+                    "links": null
+                }
+            ],
+            "properties": {
+                "Node name for S&R": "ShowText|pysssss"
+            },
+            "widgets_values": [
+                "这幅画是达·芬奇的著名作品《蒙娜丽莎》。画中描绘了一位神秘而优雅的女性，她坐在一个风景如画的背景前。她的表情平静而神秘，微微上扬的嘴角和深邃的眼神给观者留下了深刻的印象。她的头发被精心地盘起，身穿深色的衣服，袖口有金色的装饰。背景是一片宁静的自然风光，包括树木、河流和远处的山丘，整体色调柔和，充满了文艺复兴时期的艺术风格。"
+            ]
+        },
+        {
+            "id": 4,
+            "type": "LoadImage",
+            "pos": [
+                470.3968811035156,
+                215.3765106201172
+            ],
+            "size": [
+                270,
+                314
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "IMAGE",
+                    "type": "IMAGE",
+                    "links": [
+                        2
+                    ]
+                },
+                {
+                    "name": "MASK",
+                    "type": "MASK",
+                    "links": null
+                }
+            ],
+            "properties": {
+                "Node name for S&R": "LoadImage"
+            },
+            "widgets_values": [
+                "Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+                "image"
+            ]
+        }
+    ],
+    "links": [
+        [
+            2,
+            4,
+            0,
+            3,
+            0,
+            "IMAGE"
+        ],
+        [
+            3,
+            3,
+            0,
+            2,
+            0,
+            "STRING"
+        ]
+    ],
+    "groups": [],
+    "config": {},
+    "extra": {
+        "ds": {
+            "scale": 1.1,
+            "offset": [
+                -28.994184662164272,
+                -71.02636273502272
+            ]
+        },
+        "frontendVersion": "1.23.4"
+    },
+    "version": 0.4
+}

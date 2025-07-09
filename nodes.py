@@ -7,23 +7,190 @@ from llama_cpp import Llama
 import re
 import json
 from pathlib import Path
+import gc
+from transformers import (
+    Qwen2_5_VLForConditionalGeneration,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    AutoProcessor,
+    BitsAndBytesConfig,
+)
+from PIL import Image
+import numpy as np
+from qwen_vl_utils import process_vision_info
 
-class Qwen3_GGUF:
+def tensor_to_pil(image_tensor, batch_index=0) -> Image:
+    # Convert tensor of shape [batch, height, width, channels] at the batch_index to PIL Image
+    image_tensor = image_tensor[batch_index].unsqueeze(0)
+    i = 255.0 * image_tensor.cpu().numpy()
+    img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8).squeeze())
+    return img
+
+class ModelsInfo:
     def __init__(self):
-        self.tokenizer = None
-        self.model = None
         current_dir = Path(__file__).parent.resolve()
         models_info_file = os.path.join(current_dir, "models.json")
         with open(models_info_file, "r", encoding="utf-8") as f:
             self.models_info = json.load(f)
+
+class Qwen25VL(ModelsInfo):
+    def __init__(self):
+        super().__init__()
+        self.model_checkpoint = None
+        self.processor = None
+        self.model = None
+        self.device = "cuda"
+        self.bf16_support = (
+            torch.cuda.is_available()
+            and torch.cuda.get_device_capability(self.device)[0] >= 8
+        )
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "text": ("STRING", {"default": "", "multiline": True}),
+                "quantization": (
+                    ["none", "4bit", "8bit"],
+                    {"default": "none"},
+                ),
+                "temperature": (
+                    "FLOAT",
+                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1},
+                ),
+                "max_new_tokens": (
+                    "INT",
+                    {"default": 512, "min": 128, "max": 2048, "step": 1},
+                ),
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "image": ("IMAGE",),
+                "video_path": ("STRING", {"default": ""}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "inference"
+    CATEGORY = "Comfyui_QwenVL"
+
+    def inference(
+        self,
+        text,
+        quantization,
+        temperature,
+        max_new_tokens,
+        seed,
+        image=None,
+        video_path=None,
+    ):
+        if seed != -1:
+            torch.manual_seed(seed)
+        # 模型是否存在
+        model = self.models_info['cuda'][2]
+        self.model_checkpoint = os.path.join(folder_paths.base_path, model['local_path'], model['repo_id'].split("/")[-1])
+        if not os.path.exists(self.model_checkpoint):
+                from huggingface_hub import snapshot_download
+                # 使用 huggingface 下载
+                file_path = snapshot_download(repo_id=model['repo_id'], local_dir=self.model_checkpoint,local_dir_use_symlinks=False)
+                print(f"Model downloaded to: {file_path}")
+            
+            
+        if self.processor is None:
+            # Define min_pixels and max_pixels:
+            # Images will be resized to maintain their aspect ratio
+            # within the range of min_pixels and max_pixels.
+            min_pixels = 256*28*28
+            max_pixels = 1024*28*28 
+
+            self.processor = AutoProcessor.from_pretrained(
+                self.model_checkpoint,
+                min_pixels=min_pixels,
+                max_pixels=max_pixels,
+            )
+
+        if self.model is None:
+            # Load the model on the available device(s)
+            if quantization == "4bit":
+                quantization_config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                )
+            elif quantization == "8bit":
+                quantization_config = BitsAndBytesConfig(
+                    load_in_8bit=True,
+                )
+            else:
+                quantization_config = None
+
+            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                self.model_checkpoint,
+                torch_dtype=torch.bfloat16 if self.bf16_support else torch.float16,
+                device_map="auto",
+                quantization_config=quantization_config,
+            )
+
+        with torch.no_grad():
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": text},
+                    ],
+                }
+            ]
+            print("deal image")
+            pil_image = tensor_to_pil(image)
+            messages[0]["content"].insert(0, {
+                "type": "image",
+                "image": pil_image,
+            })
+
+            # 准备输入
+            text = self.processor.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+            print("deal messages", messages)
+            image_inputs, video_inputs = process_vision_info(messages)
+            inputs = self.processor(
+                text=[text],
+                images=image_inputs,
+                videos=video_inputs,
+                padding=True,
+                return_tensors="pt",
+            ).to(self.device)
+
+            # 推理
+            try:
+                generated_ids = self.model.generate(**inputs, max_new_tokens=max_new_tokens)
+                generated_ids_trimmed = [
+                    out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+                ]
+                result = self.processor.batch_decode(
+                    generated_ids_trimmed,
+                    skip_special_tokens=True,
+                    clean_up_tokenization_spaces=False,
+                    temperature=temperature,
+                )
+            except Exception as e:
+                return (f"Error during model inference: {str(e)}",)
+
+            del self.processor
+            del self.model
+            self.processor = None
+            self.model = None
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect() 
+            return result
+    
+class Qwen3(ModelsInfo):
+    def __init__(self):
+        super().__init__()
+        self.tokenizer = None
+        self.model = None
         gguf_info = self.models_info['cuda'][0]
         tokenizer_info = self.models_info['cuda'][1]
         self.gguf_file = os.path.join(folder_paths.base_path, gguf_info['local_path'], gguf_info['repo_id'].split("/")[-1], gguf_info['files'][0])
         self.tokenizer_dir = os.path.join(folder_paths.base_path, tokenizer_info['local_path'], tokenizer_info['repo_id'].split("/")[-1])
-        self.bf16_support = (
-            torch.cuda.is_available()
-            and torch.cuda.get_device_capability("cuda")[0] >= 8
-        )
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -66,7 +233,7 @@ class Qwen3_GGUF:
         if direct:
             return (user_prompt,)
         # 模型是否存在
-        models = self.models_info['cuda']
+        models = self.models_info['cuda'][:2]
         for model in models:
             file_dir = os.path.join(folder_paths.base_path, model['local_path'], model['repo_id'].split("/")[-1])
             for file_name in model['files']:
@@ -77,7 +244,7 @@ class Qwen3_GGUF:
                         filename=file_name,
                         local_dir=file_dir
                     )
-                    print(f"Model downloaded to: {os.path.join(file_dir, file_name)}")
+                    print(f"Model downloaded to: {file_path}")
         if self.tokenizer is None:
             self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_dir)
         # 3. 格式化提示（Qwen3 使用特定的聊天模板）
@@ -130,17 +297,11 @@ class Qwen3_GGUF:
             seed=seed
         )
         response = remove_think_tags(output["choices"][0]["text"])
-        # if not keep_model_loaded:
-        #     del self.tokenizer
-        #     del self.model
-        #     self.tokenizer = None
-        #     self.model = None
-        #     torch.cuda.empty_cache()
-        #     torch.cuda.ipc_collect()
         del self.tokenizer
         del self.model
         self.tokenizer = None
         self.model = None
+        gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
         return (response,)

@@ -1,0 +1,104 @@
+{
+    "id": "2ed2e48c-3fed-4fd2-ab94-81a273ec7c54",
+    "revision": 0,
+    "last_node_id": 2,
+    "last_link_id": 1,
+    "nodes": [
+        {
+            "id": 2,
+            "type": "ShowText|pysssss",
+            "pos": [
+                1417.0943603515625,
+                390.4084777832031
+            ],
+            "size": [
+                140,
+                76
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+                {
+                    "name": "text",
+                    "type": "STRING",
+                    "link": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "STRING",
+                    "shape": 6,
+                    "type": "STRING",
+                    "links": null
+                }
+            ],
+            "properties": {
+                "Node name for S&R": "ShowText|pysssss"
+            },
+            "widgets_values": [
+                "我是Qwen，阿里巴巴集团旗下的通义实验室自主研发的超大规模语言模型。我能够进行多轮对话、回答问题、创作文字，如撰写故事、诗歌、剧本，甚至进行逻辑推理和编程。我的训练数据来自互联网上的大量文本，使我具备广泛的知识和语言理解能力。我旨在为用户提供帮助和解答各种问题，同时遵循阿里巴巴集团的伦理准则和法律法规。如果您有任何问题或需要帮助，欢迎随时向我提问！"
+            ]
+        },
+        {
+            "id": 1,
+            "type": "Qwen3",
+            "pos": [
+                602.4210205078125,
+                315.62152099609375
+            ],
+            "size": [
+                400,
+                262
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "STRING",
+                    "type": "STRING",
+                    "links": [
+                        1
+                    ]
+                }
+            ],
+            "properties": {
+                "Node name for S&R": "Qwen3"
+            },
+            "widgets_values": [
+                "你是一个智能助理",
+                "你是谁",
+                false,
+                0.7,
+                512,
+                1089675964023069,
+                "randomize"
+            ]
+        }
+    ],
+    "links": [
+        [
+            1,
+            1,
+            0,
+            2,
+            0,
+            "STRING"
+        ]
+    ],
+    "groups": [],
+    "config": {},
+    "extra": {
+        "ds": {
+            "scale": 1.1,
+            "offset": [
+                -28.876997162164272,
+                -71.02636273502272
+            ]
+        },
+        "frontendVersion": "1.23.4"
+    },
+    "version": 0.4
+}

@@ -18,6 +18,10 @@
                 "config.json",
                 "generation_config.json"
             ]
+        },
+        {
+            "repo_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+            "local_path": "models/LLM"
         }
     ]
 }
