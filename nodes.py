@@ -18,6 +18,7 @@ from transformers import (
 from PIL import Image
 import numpy as np
 from qwen_vl_utils import process_vision_info
+import pynvml
 
 def tensor_to_pil(image_tensor, batch_index=0) -> Image:
     # Convert tensor of shape [batch, height, width, channels] at the batch_index to PIL Image
@@ -32,6 +33,18 @@ class ModelsInfo:
         models_info_file = os.path.join(current_dir, "models.json")
         with open(models_info_file, "r", encoding="utf-8") as f:
             self.models_info = json.load(f)
+
+def get_free_vram():
+    if torch.cuda.is_available():
+        pynvml.nvmlInit()
+        # 这里的0是GPU id
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        print(f"总显存: {meminfo.total/1024**3:.2f} GB, 已用显存: {meminfo.used/1024**3:.2f} GB, 剩余显存: {meminfo.free/1024**3:.2f} GB")
+        return meminfo.free
+    else:
+        print("未检测到 GPU")
+        return 0
 
 class Qwen25VL(ModelsInfo):
     def __init__(self):
@@ -261,6 +274,12 @@ class Qwen3(ModelsInfo):
                 add_generation_prompt=True
             )
             return prompt
+        # 检查当前显存是否能够加载
+        if get_free_vram() < 8 * 1024**3:
+            import comfy.model_management as mm
+            gc.collect()
+            mm.unload_all_models()
+            mm.soft_empty_cache()
         if self.model is None:
             self.model = Llama(
                 model_path=self.gguf_file,
@@ -271,7 +290,6 @@ class Qwen3(ModelsInfo):
                 verbose=False,
             )
         prompt = format_prompt(system_prompt, user_prompt)
-    
         # 5. 生成响应
         def remove_think_tags(text):
             """

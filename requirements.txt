@@ -3,3 +3,4 @@ torch
 transformers
 llama-cpp-python
 qwen_vl_utils
+nvidia-ml-py
