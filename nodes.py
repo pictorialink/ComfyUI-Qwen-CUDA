@@ -62,6 +62,7 @@ class Qwen25VL(ModelsInfo):
     def INPUT_TYPES(s):
         return {
             "required": {
+                "image": ("IMAGE",),
                 "text": ("STRING", {"default": "", "multiline": True}),
                 "quantization": (
                     ["none", "4bit", "8bit"],
@@ -77,10 +78,6 @@ class Qwen25VL(ModelsInfo):
                 ),
                 "seed": ("INT", {"default": -1}),
             },
-            "optional": {
-                "image": ("IMAGE",),
-                "video_path": ("STRING", {"default": ""}),
-            },
         }
 
     RETURN_TYPES = ("STRING",)
@@ -95,13 +92,12 @@ class Qwen25VL(ModelsInfo):
         max_new_tokens,
         seed,
         image=None,
-        video_path=None,
     ):
         if seed != -1:
             torch.manual_seed(seed)
         # 模型是否存在
         model = self.models_info['cuda'][2]
-        self.model_checkpoint = os.path.join(folder_paths.base_path, model['local_path'], model['repo_id'].split("/")[-1])
+        self.model_checkpoint = os.path.join(folder_paths.base_path, model['local_path'])
         if not os.path.exists(self.model_checkpoint):
                 from huggingface_hub import snapshot_download
                 # 使用 huggingface 下载
@@ -202,8 +198,8 @@ class Qwen3(ModelsInfo):
         self.model = None
         gguf_info = self.models_info['cuda'][0]
         tokenizer_info = self.models_info['cuda'][1]
-        self.gguf_file = os.path.join(folder_paths.base_path, gguf_info['local_path'], gguf_info['repo_id'].split("/")[-1], gguf_info['files'][0])
-        self.tokenizer_dir = os.path.join(folder_paths.base_path, tokenizer_info['local_path'], tokenizer_info['repo_id'].split("/")[-1])
+        self.gguf_file = os.path.join(folder_paths.base_path, gguf_info['local_path'], gguf_info['files'][0])
+        self.tokenizer_dir = os.path.join(folder_paths.base_path, tokenizer_info['local_path'])
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -248,7 +244,7 @@ class Qwen3(ModelsInfo):
         # 模型是否存在
         models = self.models_info['cuda'][:2]
         for model in models:
-            file_dir = os.path.join(folder_paths.base_path, model['local_path'], model['repo_id'].split("/")[-1])
+            file_dir = os.path.join(folder_paths.base_path, model['local_path'])
             for file_name in model['files']:
                 if not os.path.exists(os.path.join(file_dir, file_name)):
                     # 使用 huggingface 下载

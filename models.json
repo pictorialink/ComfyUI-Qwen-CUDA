@@ -2,14 +2,14 @@
     "cuda": [
         {
             "repo_id": "Qwen/Qwen3-8B-GGUF",
-            "local_path": "models/LLM",
+            "local_path": "models/LLM/Qwen3-8B-GGUF",
             "files": [
                 "Qwen3-8B-Q5_K_M.gguf"
             ]
         },
         {
             "repo_id": "Qwen/Qwen3-8B",
-            "local_path": "models/LLM",
+            "local_path": "models/LLM/Qwen3-8B",
             "files": [
                 "tokenizer_config.json",
                 "vocab.json",
@@ -21,7 +21,7 @@
         },
         {
             "repo_id": "Qwen/Qwen2.5-VL-7B-Instruct",
-            "local_path": "models/LLM"
+            "local_path": "models/LLM/Qwen2.5-VL-7B-Instruct"
         }
     ]
 }
